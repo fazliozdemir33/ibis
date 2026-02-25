@@ -6,16 +6,20 @@ import 'constants/app_colors.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'services/auth_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Firebase'i başlat
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
-    debugPrint("Firebase başlatma hatası: $e");
-    // Hata olsa bile uygulamayı aç, ama auth çalışmayabilir
+    debugPrint("Firebase başlatma kritik hata: $e");
+    // Kritik servisler çalışmayacağı için burada durmak veya
+    // kullanıcıya hata göstermek daha iyidir.
   }
 
   runApp(const IbisApp());
