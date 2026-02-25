@@ -483,315 +483,318 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Progress Bar
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Soru ${_currentIndex + 1}/${_words.length}",
-                      style: TextStyle(
-                        color: AppColors.white.withValues(alpha: 0.8),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Progress Bar
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Soru ${_currentIndex + 1}/${_words.length}",
+                        style: TextStyle(
+                          color: AppColors.white.withValues(alpha: 0.8),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
 
-                    // Timer Badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                          color: _timeLeft <= 3
-                              ? AppColors.wrong.withOpacity(0.2)
-                              : Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
+                      // Timer Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
                             color: _timeLeft <= 3
-                                ? AppColors.wrong.withOpacity(0.5)
+                                ? AppColors.wrong.withOpacity(0.2)
                                 : Colors.white.withOpacity(0.2),
-                          )),
-                      child: Row(
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: _timeLeft <= 3
+                                  ? AppColors.wrong.withOpacity(0.5)
+                                  : Colors.white.withOpacity(0.2),
+                            )),
+                        child: Row(
+                          children: [
+                            Icon(Icons.timer_outlined,
+                                size: 16,
+                                color: _timeLeft <= 3
+                                    ? AppColors.wrong
+                                    : Colors.white),
+                            const SizedBox(width: 6),
+                            Text(
+                              "$_timeLeft sn",
+                              style: TextStyle(
+                                color: _timeLeft <= 3
+                                    ? AppColors.wrong
+                                    : Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Row(
                         children: [
-                          Icon(Icons.timer_outlined,
-                              size: 16,
-                              color: _timeLeft <= 3
-                                  ? AppColors.wrong
-                                  : Colors.white),
-                          const SizedBox(width: 6),
+                          const Icon(Icons.star, color: Colors.amber, size: 16),
+                          const SizedBox(width: 4),
                           Text(
-                            "$_timeLeft sn",
-                            style: TextStyle(
-                              color: _timeLeft <= 3
-                                  ? AppColors.wrong
-                                  : Colors.white,
-                              fontWeight: FontWeight.bold,
+                            "$_score",
+                            style: const TextStyle(
+                              color: Colors.amber,
                               fontSize: 14,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.gradientLight),
+                      minHeight: 6,
                     ),
+                  ),
+                ],
+              ),
 
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 16),
-                        const SizedBox(width: 4),
-                        Text(
-                          "$_score",
-                          style: const TextStyle(
-                            color: Colors.amber,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+              const SizedBox(height: 32),
+
+              // Soru Kartı
+              ScaleTransition(
+                scale: _scaleAnimation,
+                child: Container(
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.gradientLight.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          "🇩🇪 Almanca",
+                          style: TextStyle(
+                            color: AppColors.gradientMid,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.gradientLight),
-                    minHeight: 6,
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              currentWord.german,
+                              style: const TextStyle(
+                                color: AppColors.textDark,
+                                fontSize: 32, // Biraz küçülttük
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow:
+                                  TextOverflow.visible, // Taşarsa aşağı kaysın
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () => _speak(currentWord.german),
+                            icon: const Icon(Icons.volume_up_rounded,
+                                color: AppColors.gradientMid, size: 32),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            splashRadius: 24,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.translate,
+                                size: 16, color: Colors.grey[600]),
+                            const SizedBox(width: 6),
+                            Text(
+                              "Türkçe karşılığı nedir?",
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-
-            const SizedBox(height: 32),
-
-            // Soru Kartı
-            ScaleTransition(
-              scale: _scaleAnimation,
-              child: Container(
-                padding: const EdgeInsets.all(32),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 30,
-                      offset: const Offset(0, 15),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.gradientLight.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        "🇩🇪 Almanca",
-                        style: TextStyle(
-                          color: AppColors.gradientMid,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            currentWord.german,
-                            style: const TextStyle(
-                              color: AppColors.textDark,
-                              fontSize: 32, // Biraz küçülttük
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow:
-                                TextOverflow.visible, // Taşarsa aşağı kaysın
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () => _speak(currentWord.german),
-                          icon: const Icon(Icons.volume_up_rounded,
-                              color: AppColors.gradientMid, size: 32),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          splashRadius: 24,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.translate,
-                              size: 16, color: Colors.grey[600]),
-                          const SizedBox(width: 6),
-                          Text(
-                            "Türkçe karşılığı nedir?",
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ),
-            ),
 
-            const SizedBox(height: 32),
+              const SizedBox(height: 32),
 
-            // Şıklar
-            if (_currentOptions.length == 4)
-              ...List.generate(4, (index) {
-                String option = _currentOptions[index];
-                bool isSelected = _selectedOptionIndex == index;
-                bool isCorrectOption = option == currentWord.turkish;
+              // Şıklar
+              if (_currentOptions.length == 4)
+                ...List.generate(4, (index) {
+                  String option = _currentOptions[index];
+                  bool isSelected = _selectedOptionIndex == index;
+                  bool isCorrectOption = option == currentWord.turkish;
 
-                // Varsayılan: Beyaz Arka Plan (Soru kartı gibi)
-                Color bgColor = Colors.white;
-                Color textColor = AppColors.textDark;
-                Color borderColor = Colors.transparent;
-                Color circleColor =
-                    AppColors.gradientMid.withValues(alpha: 0.1);
-                Color circleTextColor = AppColors.gradientMid;
-                IconData? icon;
+                  // Varsayılan: Beyaz Arka Plan (Soru kartı gibi)
+                  Color bgColor = Colors.white;
+                  Color textColor = AppColors.textDark;
+                  Color borderColor = Colors.transparent;
+                  Color circleColor =
+                      AppColors.gradientMid.withValues(alpha: 0.1);
+                  Color circleTextColor = AppColors.gradientMid;
+                  IconData? icon;
 
-                if (_isAnswered) {
-                  if (isSelected || isCorrectOption) {
-                    // Seçilen veya doğru olan şıklar beyaz kalsın (arkaplandan ayrışsın)
-                    bgColor = Colors.white;
+                  if (_isAnswered) {
+                    if (isSelected || isCorrectOption) {
+                      // Seçilen veya doğru olan şıklar beyaz kalsın (arkaplandan ayrışsın)
+                      bgColor = Colors.white;
 
-                    if (isCorrectOption) {
-                      borderColor = AppColors.correct; // Yeşil çerçeve
-                      textColor = AppColors.correct; // Yeşil yazı
-                      circleColor = AppColors.correct.withValues(alpha: 0.1);
-                      circleTextColor = AppColors.correct;
-                      icon = Icons.check_circle;
-                    } else if (isSelected && !isCorrectOption) {
-                      borderColor = AppColors.wrong; // Kırmızı çerçeve
-                      textColor = AppColors.wrong; // Kırmızı yazı
-                      circleColor = AppColors.wrong.withValues(alpha: 0.1);
-                      circleTextColor = AppColors.wrong;
-                      icon = Icons.cancel;
+                      if (isCorrectOption) {
+                        borderColor = AppColors.correct; // Yeşil çerçeve
+                        textColor = AppColors.correct; // Yeşil yazı
+                        circleColor = AppColors.correct.withValues(alpha: 0.1);
+                        circleTextColor = AppColors.correct;
+                        icon = Icons.check_circle;
+                      } else if (isSelected && !isCorrectOption) {
+                        borderColor = AppColors.wrong; // Kırmızı çerçeve
+                        textColor = AppColors.wrong; // Kırmızı yazı
+                        circleColor = AppColors.wrong.withValues(alpha: 0.1);
+                        circleTextColor = AppColors.wrong;
+                        icon = Icons.cancel;
+                      }
+                    } else {
+                      // Seçilmeyen diğer şıklar sönükleşsin
+                      bgColor = Colors.white.withValues(alpha: 0.3);
+                      textColor = AppColors.textDark.withValues(alpha: 0.3);
+                      circleColor = Colors.transparent;
+                      circleTextColor =
+                          AppColors.textDark.withValues(alpha: 0.3);
                     }
-                  } else {
-                    // Seçilmeyen diğer şıklar sönükleşsin
-                    bgColor = Colors.white.withValues(alpha: 0.3);
-                    textColor = AppColors.textDark.withValues(alpha: 0.3);
-                    circleColor = Colors.transparent;
-                    circleTextColor = AppColors.textDark.withValues(alpha: 0.3);
+                  } else if (_timeLeft == 0 && isCorrectOption) {
+                    borderColor = Colors.amber;
+                    bgColor = Colors.white;
                   }
-                } else if (_timeLeft == 0 && isCorrectOption) {
-                  borderColor = Colors.amber;
-                  bgColor = Colors.white;
-                }
 
-                Widget optionWidget = Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: InkWell(
-                    onTap: () => _handleAnswer(index),
-                    borderRadius: BorderRadius.circular(16),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: bgColor,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color: borderColor,
-                            width:
-                                (_isAnswered && (isCorrectOption || isSelected))
-                                    ? 3.0
-                                    : 1.5),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: circleColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                String.fromCharCode(65 + index),
-                                style: TextStyle(
-                                  color: circleTextColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                  Widget optionWidget = Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: InkWell(
+                      onTap: () => _handleAnswer(index),
+                      borderRadius: BorderRadius.circular(16),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: bgColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: borderColor,
+                              width: (_isAnswered &&
+                                      (isCorrectOption || isSelected))
+                                  ? 3.0
+                                  : 1.5),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: circleColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  String.fromCharCode(65 + index),
+                                  style: TextStyle(
+                                    color: circleTextColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              option,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: textColor,
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                option,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: textColor,
+                                ),
                               ),
                             ),
-                          ),
-                          if (icon != null) ...[
-                            const SizedBox(width: 8),
-                            Icon(icon, color: Colors.white, size: 22),
+                            if (icon != null) ...[
+                              const SizedBox(width: 8),
+                              Icon(icon, color: Colors.white, size: 22),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-
-                if (isCorrectOption) {
-                  return AnimatedBuilder(
-                    animation: _shakeController,
-                    builder: (context, child) {
-                      final double offset =
-                          sin(_shakeController.value * pi * 4) * 8;
-                      return Transform.translate(
-                        offset: Offset(offset, 0),
-                        child: child,
-                      );
-                    },
-                    child: optionWidget,
                   );
-                }
-                return optionWidget;
-              }),
-            const SizedBox(height: 80), // Reklam alanı için boşluk
-          ],
+
+                  if (isCorrectOption) {
+                    return AnimatedBuilder(
+                      animation: _shakeController,
+                      builder: (context, child) {
+                        final double offset =
+                            sin(_shakeController.value * pi * 4) * 8;
+                        return Transform.translate(
+                          offset: Offset(offset, 0),
+                          child: child,
+                        );
+                      },
+                      child: optionWidget,
+                    );
+                  }
+                  return optionWidget;
+                }),
+              const SizedBox(height: 80), // Reklam alanı için boşluk
+            ],
+          ),
         ),
       ),
     );
