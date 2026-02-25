@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import '../widgets/gradient_scaffold.dart';
 import '../constants/app_colors.dart';
 import 'register_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -32,11 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _emailController.text,
         _passwordController.text,
       );
-      // Başarılı giriş sonrası yönlendirme main.dart StreamBuilder ile yapılacak
-      // ama emin olmak için:
-      if (mounted) {
-        // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const HomeScreen()));
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo veya İkon
               // Logo
               Center(
                 child: Hero(
@@ -203,6 +198,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 16),
+              // Gizlilik Politikası
+              Center(
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PrivacyPolicyScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Gizlilik Politikası",
+                    style: TextStyle(
+                      color: AppColors.white.withValues(alpha: 0.7),
+                      fontSize: 12,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.white.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
