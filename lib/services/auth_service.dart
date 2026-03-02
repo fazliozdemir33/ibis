@@ -141,6 +141,24 @@ class AuthService {
     });
   }
 
+  // Hesabı Sil
+  Future<void> deleteAccount() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      try {
+        // 1. Delete user data from Firestore
+        await _firestore.collection('users').doc(user.uid).delete();
+        // 2. Delete the user account from Firebase Auth
+        await user.delete();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'requires-recent-login') {
+          throw 'Hesabınızı silmek için güvenlik nedeniyle lütfen çıkış yapıp tekrar giriş yapın.';
+        }
+        throw _handleAuthException(e);
+      }
+    }
+  }
+
   // Çıkış Yap
   Future<void> signOut() async {
     await _auth.signOut();
