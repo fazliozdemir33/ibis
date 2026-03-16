@@ -113,9 +113,15 @@ class WordService {
           .where('level', isEqualTo: level.name.toUpperCase())
           .get();
 
-      return snapshot.docs.map((doc) {
+      List<Word> words = snapshot.docs.map((doc) {
         return Word.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
+
+      // İndeks hatasını önlemek için sıralamayı istemci tarafında yapıyoruz.
+      // Bu sayede Firebase Console'da manuel indeks oluşturmaya gerek kalmaz.
+      words.sort((a, b) => a.german.compareTo(b.german));
+
+      return words;
     } catch (e) {
       print("Kelimeler getirilirken hata oluştu: $e");
       return [];
@@ -140,6 +146,51 @@ class WordService {
     } catch (e) {
       print("Tüm kelimeler çekilirken hata: $e");
       return [];
+    }
+  }
+
+  // --- Seviye İlerlemesi (Level Progress) Yönetimi ---
+
+  // Seviye ilerlemesini kaydet
+  Future<void> saveLevelProgress(Level level, int index) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('progress')
+          .doc(level.name.toUpperCase())
+          .set({
+        'currentIndex': index,
+        'lastUpdated': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print("İlerleme kaydedilirken hata oluştu: $e");
+    }
+  }
+
+  // Seviye ilerlemesini getir
+  Future<int> getLevelProgress(Level level) async {
+    final user = _auth.currentUser;
+    if (user == null) return 0;
+
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('progress')
+          .doc(level.name.toUpperCase())
+          .get();
+
+      if (doc.exists) {
+        return doc.data()?['currentIndex'] ?? 0;
+      }
+      return 0;
+    } catch (e) {
+      print("İlerleme getirilirken hata oluştu: $e");
+      return 0;
     }
   }
 

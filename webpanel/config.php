@@ -71,7 +71,6 @@ class FirebaseService
         ]));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($ch);
-        curl_close($ch);
 
         $tokenData = json_decode($response, true);
         if (isset($tokenData['access_token'])) {
@@ -102,7 +101,6 @@ class FirebaseService
         ]);
 
         $response = curl_exec($ch);
-        curl_close($ch);
 
         $data = json_decode($response, true);
         $results = [];
@@ -141,7 +139,6 @@ class FirebaseService
         ]);
 
         $response = curl_exec($ch);
-        curl_close($ch);
 
         return json_decode($response, true);
     }
@@ -159,7 +156,47 @@ class FirebaseService
         ]);
 
         curl_exec($ch);
-        curl_close($ch);
+    }
+
+    public function getAdminSettings()
+    {
+        $url = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/settings/admin";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $this->accessToken
+        ]);
+
+        $response = curl_exec($ch);
+
+        $data = json_decode($response, true);
+        if (isset($data['fields'])) {
+            return $this->parseFields($data['fields']);
+        }
+        return null;
+    }
+
+    public function updateAdminSettings($data)
+    {
+        $url = "https://firestore.googleapis.com/v1/projects/{$this->projectId}/databases/(default)/documents/settings/admin";
+
+        $firestoreData = ['fields' => $this->formatFields($data)];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($firestoreData));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $this->accessToken,
+            'Content-Type: application/json'
+        ]);
+
+        $response = curl_exec($ch);
+
+        return json_decode($response, true);
     }
 
     // Helper: Convert Firestore format to simple array
@@ -193,6 +230,14 @@ class FirebaseService
                 $fields[$key] = ['booleanValue' => $value];
         }
         return $fields;
+    }
+}
+
+function checkAuth()
+{
+    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+        header('Location: login.php');
+        exit;
     }
 }
 ?>

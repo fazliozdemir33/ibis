@@ -8,9 +8,45 @@ import '../services/auth_service.dart';
 import '../services/word_service.dart';
 import 'mistakes_screen.dart';
 import 'leaderboard_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../services/ad_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  BannerAd? _bannerAd;
+  bool _isBannerAdReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdService.createBannerAd(
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdReady = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        ad.dispose();
+      },
+    );
+    _bannerAd?.load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -319,6 +355,14 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
+          if (_isBannerAdReady)
+            Container(
+              alignment: Alignment.center,
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              margin: const EdgeInsets.only(bottom: 12),
+              child: AdWidget(ad: _bannerAd!),
+            ),
         ],
       ),
     );

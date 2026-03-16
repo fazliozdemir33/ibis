@@ -5,6 +5,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../models/word.dart';
 import '../services/word_service.dart';
 import '../services/auth_service.dart'; // Added import
+import '../services/ad_service.dart'; // Added import
+import 'package:google_mobile_ads/google_mobile_ads.dart'; // Added import
 import '../constants/app_colors.dart';
 import '../widgets/gradient_scaffold.dart';
 
@@ -24,6 +26,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   int _currentIndex = 0;
   int _score = 0;
   bool _isAnswered = false;
+  bool _isOptionsUpdating = false;
 
   List<String> _currentOptions = [];
   int? _selectedOptionIndex;
@@ -35,6 +38,9 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   Timer? _timer;
   int _timeLeft = 20;
   final FlutterTts flutterTts = FlutterTts();
+
+  BannerAd? _bannerAd;
+  bool _isBannerAdReady = false;
 
   @override
   void initState() {
@@ -53,6 +59,21 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
     );
     _initTts();
     _loadWords();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdService.createBannerAd(
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdReady = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        ad.dispose();
+      },
+    );
+    _bannerAd?.load();
   }
 
   Future<void> _initTts() async {
@@ -63,6 +84,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _bannerAd?.dispose();
     flutterTts.stop();
     _timer?.cancel();
     _animationController.dispose();
@@ -76,20 +98,20 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
     // Kelimeleri Firestore'dan çek
     List<Word> fetchedWords = await _wordService.getWordsForLevel(widget.level);
 
-    if (fetchedWords.isEmpty) {
-      if (mounted) {
-        // Eğer veritabanı boşsa, ilk verileri yüklemek isteyip istemediğini sor
-        // veya otomatik yükle (geliştirme aşamasında otomatik yükleyebiliriz)
-        // Kullanıcıya bilgi verip geri gönderelim veya yükleyelim.
-        // Şimdilik boş liste dönecek, build metodunda bunu ele alacağız.
+    // Kayıtlı ilerlemeyi getir
+    int savedIndex = await _wordService.getLevelProgress(widget.level);
+
+    if (fetchedWords.isNotEmpty) {
+      // Eğer önceden bitirdiyse (son soruya ulaştıysa) baştan başlasın
+      if (savedIndex >= fetchedWords.length) {
+        savedIndex = 0;
       }
-    } else {
-      fetchedWords.shuffle();
     }
 
     if (mounted) {
       setState(() {
         _words = fetchedWords;
+        _currentIndex = savedIndex; // Kayıtlı indeksten başla
         _isLoading = false;
         if (_words.isNotEmpty) {
           _generateOptions();
@@ -141,6 +163,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
       setState(() {
         _currentOptions = [correctAnswer, ...wrongOptions];
         _currentOptions.shuffle();
+        _isOptionsUpdating = false;
         if (!_isAnswered) _startTimer();
       });
     }
@@ -151,7 +174,7 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   }
 
   void _handleAnswer(int index) {
-    if (_isAnswered) return;
+    if (_isAnswered || _isOptionsUpdating) return;
     _timer?.cancel();
 
     setState(() {
@@ -176,15 +199,19 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
   void _nextQuestion() {
     if (_currentIndex < _words.length - 1) {
       setState(() {
+        _isOptionsUpdating = true;
         _currentIndex++;
         _isAnswered = false;
         _selectedOptionIndex = null;
-        // Yeni şıkları oluştur
+        // İlerlemeyi kaydet
+        _wordService.saveLevelProgress(widget.level, _currentIndex);
       });
-      _generateOptions(); // Asenkron olduğu için setState dışında çağırdık
+      _generateOptions();
       _animationController.reset();
       _animationController.forward();
     } else {
+      // Test bittiğinde ilerlemeyi "bitmiş" olarak işaretle (indeksi kelime sayısına eşitle)
+      _wordService.saveLevelProgress(widget.level, _currentIndex + 1);
       _showResultDialog();
     }
   }
@@ -370,6 +397,8 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                           _score = 0;
                           _words.shuffle();
                           _isAnswered = false;
+                          // İlerlemeyi sıfırla
+                          _wordService.saveLevelProgress(widget.level, 0);
                         });
                         _generateOptions();
                         _animationController.reset();
@@ -792,6 +821,17 @@ class _QuizScreenState extends State<QuizScreen> with TickerProviderStateMixin {
                   }
                   return optionWidget;
                 }),
+
+              if (_isBannerAdReady)
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: SizedBox(
+                    width: _bannerAd!.size.width.toDouble(),
+                    height: _bannerAd!.size.height.toDouble(),
+                    child: AdWidget(ad: _bannerAd!),
+                  ),
+                ),
+
               const SizedBox(height: 80), // Reklam alanı için boşluk
             ],
           ),

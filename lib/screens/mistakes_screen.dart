@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../models/word.dart';
 import '../services/word_service.dart';
+import '../services/ad_service.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../constants/app_colors.dart';
 import '../widgets/gradient_scaffold.dart';
 
@@ -30,6 +32,9 @@ class _MistakesScreenState extends State<MistakesScreen>
   late Animation<double> _scaleAnimation;
   final FlutterTts flutterTts = FlutterTts();
 
+  BannerAd? _bannerAd;
+  bool _isBannerAdReady = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +47,21 @@ class _MistakesScreenState extends State<MistakesScreen>
     );
     _initTts();
     _loadMistakes();
+    _loadBannerAd();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdService.createBannerAd(
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdReady = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        ad.dispose();
+      },
+    );
+    _bannerAd?.load();
   }
 
   Future<void> _initTts() async {
@@ -52,6 +72,7 @@ class _MistakesScreenState extends State<MistakesScreen>
 
   @override
   void dispose() {
+    _bannerAd?.dispose();
     flutterTts.stop();
     _animationController.dispose();
     super.dispose();
@@ -426,6 +447,17 @@ class _MistakesScreenState extends State<MistakesScreen>
                   ),
                 );
               }),
+
+            if (_isBannerAdReady)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+              ),
+
             const SizedBox(height: 40),
           ],
         ),

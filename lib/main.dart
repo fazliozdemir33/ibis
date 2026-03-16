@@ -6,6 +6,7 @@ import 'constants/app_colors.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'services/auth_service.dart';
+import 'services/ad_service.dart'; // Yeni import
 import 'firebase_options.dart';
 
 void main() async {
@@ -18,9 +19,10 @@ void main() async {
     );
   } catch (e) {
     debugPrint("Firebase başlatma kritik hata: $e");
-    // Kritik servisler çalışmayacağı için burada durmak veya
-    // kullanıcıya hata göstermek daha iyidir.
   }
+
+  // AdMob'u başlat
+  await AdService().init();
 
   runApp(const IbisApp());
 }

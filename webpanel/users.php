@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+checkAuth();
 $fb = new FirebaseService();
 
 // Fetch Users
@@ -158,6 +159,12 @@ usort($allUsers, function ($a, $b) {
             </a>
             <a href="users.php" class="nav-link active">
                 <i class="fas fa-users"></i> <span>Kullanıcılar</span>
+            </a>
+            <a href="settings.php" class="nav-link">
+                <i class="fas fa-cog"></i> <span>Ayarlar</span>
+            </a>
+            <a href="logout.php" class="nav-link mt-5">
+                <i class="fas fa-sign-out-alt"></i> <span>Çıkış Yap</span>
             </a>
         </div>
     </nav>
